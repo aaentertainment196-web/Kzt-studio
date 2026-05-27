@@ -86,9 +86,23 @@
 <script type="text/babel">
   const { useState, useEffect } = React;
 
-  function getCookie(n){return document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(n+'='))?.split('=')[1]||'';}
-  function setCookie(n,v){document.cookie=n+'='+v+';max-age=315360000;path=/';}
-  let ACTIVE_KEY = getCookie('kzt_key')||localStorage.getItem('kzt_key')||'';
+  // Key storage - tries all methods for maximum persistence
+  function saveKey(v){
+    try{localStorage.setItem('kzt_key',v);}catch(e){}
+    try{sessionStorage.setItem('kzt_key',v);}catch(e){}
+    try{document.cookie='kzt_key='+encodeURIComponent(v)+';max-age=315360000;path=/';}catch(e){}
+    try{document.cookie='kzt_key='+encodeURIComponent(v)+';max-age=315360000;path=/;SameSite=Lax';}catch(e){}
+  }
+  function loadKey(){
+    let k='';
+    try{k=localStorage.getItem('kzt_key')||'';}catch(e){}
+    if(!k){try{k=sessionStorage.getItem('kzt_key')||'';}catch(e){}}
+    if(!k){try{const c=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith('kzt_key='));if(c)k=decodeURIComponent(c.split('=')[1]);}catch(e){}}
+    return k;
+  }
+  function getCookie(n){return loadKey();}
+  function setCookie(n,v){saveKey(v);}
+  let ACTIVE_KEY = loadKey();
 
   const VOICES=[
     {id:'Kore',name:'ကြယ်စင်',label:'ကြယ်စင် (Female)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=KyiPyar'},
@@ -321,9 +335,9 @@
               </div>
               <input id="mkI" type="password" defaultValue={ACTIVE_KEY} placeholder="AIzaSy..."
                 style={{width:'100%',background:'rgba(0,0,0,0.5)',border:'1.5px solid rgba(123,0,255,0.5)',borderRadius:'0.75rem',padding:'13px 16px',fontSize:'13px',color:'#fff',outline:'none',fontFamily:'monospace',boxSizing:'border-box',marginBottom:'16px'}}
-                onKeyDown={e=>{if(e.key==='Enter'){const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;setCookie('kzt_key',v);localStorage.setItem('kzt_key',v);setShowApiModal(false);}}}
+                onKeyDown={e=>{if(e.key==='Enter'){const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;saveKey(v);setShowApiModal(false);}}}
               />
-              <button onClick={()=>{const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;setCookie('kzt_key',v);localStorage.setItem('kzt_key',v);setShowApiModal(false);}}
+              <button onClick={()=>{const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;saveKey(v);setShowApiModal(false);}}
                 style={{width:'100%',padding:'14px',background:'linear-gradient(135deg,#7b00ff,#e600a0)',border:'none',borderRadius:'0.75rem',color:'#fff',fontWeight:900,fontSize:'13px',cursor:'pointer'}}>
                 <i className="fa-solid fa-floppy-disk" style={{marginRight:'8px'}}></i>Save &amp; Continue
               </button>
@@ -334,7 +348,7 @@
 
         {/* Header */}
         <header style={{textAlign:'center',marginBottom:'24px',position:'relative'}}>
-          <button onClick={()=>{const v=prompt('Gemini API Key:',ACTIVE_KEY);if(!v)return;const t=v.trim();if(!t)return;ACTIVE_KEY=t;setCookie('kzt_key',t);localStorage.setItem('kzt_key',t);}}
+          <button onClick={()=>{const v=prompt('Gemini API Key:',ACTIVE_KEY);if(!v)return;const t=v.trim();if(!t)return;ACTIVE_KEY=t;saveKey(t);}}
             title="API Key" style={{position:'absolute',top:0,right:0,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.5)',width:'38px',height:'38px',borderRadius:'0.75rem',cursor:'pointer',fontSize:'16px',display:'flex',alignItems:'center',justifyContent:'center'}}>
             ⚙️
           </button>
