@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KZT STUDIO v2</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap');
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #050010; color: #fff; margin: 0; padding: 0; overflow-x: hidden; min-height: 100vh; }
+    .aurora-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora-bg::before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(ellipse at 20% 20%, rgba(120,0,255,0.35) 0%, transparent 50%), radial-gradient(ellipse at 80% 10%, rgba(0,200,255,0.3) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(255,0,200,0.25) 0%, transparent 50%), radial-gradient(ellipse at 10% 70%, rgba(0,255,180,0.2) 0%, transparent 50%); animation: aurora 12s ease-in-out infinite alternate; }
+    @keyframes aurora { 0%{transform:translate(0%,0%) rotate(0deg);}33%{transform:translate(3%,-3%) rotate(2deg);}66%{transform:translate(-2%,4%) rotate(-1deg);}100%{transform:translate(4%,2%) rotate(3deg);} }
+    .particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .particle{position:absolute;border-radius:50%;animation:float linear infinite;opacity:0.5;}
+    @keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:0.6;}90%{opacity:0.4;}100%{transform:translateY(-10vh) scale(1);opacity:0;}}
+    .page-content{position:relative;z-index:1;}
+    .cyber-card{position:relative;border-radius:1.5rem;padding:2px;background:linear-gradient(135deg,#7b00ff,#ff00c8,#00e5ff,#7b00ff);background-size:300% 300%;animation:borderSpin 4s linear infinite;}
+    @keyframes borderSpin{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+    .cyber-card-inner{background:rgba(10,0,30,0.92);backdrop-filter:blur(24px);border-radius:calc(1.5rem - 2px);padding:1.5rem;}
+    .rainbow-text{background:linear-gradient(90deg,#bf00ff,#ff00aa,#00cfff,#00ffb3,#bf00ff);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 3s linear infinite;font-family:'Orbitron',sans-serif;}
+    @keyframes shine{0%{background-position:0% center;}100%{background-position:200% center;}}
+    .grad-btn{background:linear-gradient(135deg,#7b00ff,#e600a0,#00cfff);background-size:200% 200%;animation:gradShift 3s ease infinite;border:none;color:#fff;font-weight:900;border-radius:1rem;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 0 20px rgba(123,0,255,0.5);}
+    .grad-btn:hover{transform:scale(1.03);box-shadow:0 0 35px rgba(230,0,160,0.6);}
+    .grad-btn:active{transform:scale(0.97);}
+    .grad-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+    @keyframes gradShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+    .style-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:0.75rem;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+    .style-btn:hover{background:rgba(123,0,255,0.25);border-color:#bf00ff;color:#fff;}
+    .style-btn.active{background:linear-gradient(135deg,rgba(123,0,255,0.5),rgba(230,0,160,0.4));border-color:#e600a0;color:#fff;box-shadow:0 0 16px rgba(230,0,160,0.5);}
+    .mode-bar{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2rem;padding:5px;display:flex;}
+    .mode-btn{flex:1;padding:10px;border-radius:1.7rem;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;transition:all 0.3s;border:none;background:transparent;color:rgba(255,255,255,0.4);}
+    .mode-btn.active{background:linear-gradient(135deg,#7b00ff,#e600a0);color:#fff;box-shadow:0 0 25px rgba(123,0,255,0.5);}
+    .avatar-img{width:52px;height:52px;border-radius:1rem;border:2px solid transparent;background:linear-gradient(#0a001e,#0a001e) padding-box,linear-gradient(135deg,#7b00ff,#ff00c8,#00e5ff) border-box;object-fit:cover;}
+    .cyber-textarea{width:100%;background:rgba(0,0,0,0.5);border:1px solid rgba(123,0,255,0.3);border-radius:1rem;padding:14px;font-size:14px;color:#fff;outline:none;resize:vertical;min-height:130px;transition:border-color 0.2s,box-shadow 0.2s;font-family:'Inter',sans-serif;}
+    .cyber-textarea:focus{border-color:#bf00ff;box-shadow:0 0 15px rgba(123,0,255,0.3);}
+    .cyber-textarea::placeholder{color:rgba(255,255,255,0.3);}
+    .cyber-select{width:100%;background:rgba(0,0,0,0.6);border:1px solid rgba(123,0,255,0.35);border-radius:0.75rem;padding:12px 14px;font-size:12px;font-weight:700;color:#fff;outline:none;cursor:pointer;}
+    audio{width:100%;height:38px;filter:hue-rotate(270deg) saturate(2) brightness(1.3);}
+    .dl-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;width:36px;height:36px;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+    .dl-btn:hover{background:#7b00ff;border-color:#bf00ff;}
+    .test-btn{background:rgba(0,207,255,0.1);border:1px solid rgba(0,207,255,0.3);color:#00cfff;padding:9px 16px;border-radius:0.75rem;font-size:11px;font-weight:900;text-transform:uppercase;display:flex;align-items:center;gap:7px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+    .test-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .remove-btn{position:absolute;top:-10px;right:-10px;width:28px;height:28px;background:#e600a0;border:3px solid #050010;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#fff;transition:all 0.2s;}
+    .add-btn{width:100%;padding:22px;border:2px dashed rgba(123,0,255,0.35);border-radius:1.5rem;background:transparent;color:rgba(255,255,255,0.3);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;}
+    .add-btn:hover{border-color:#bf00ff;color:#bf00ff;}
+    .sticky-footer{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,#050010 70%,transparent);padding:16px;z-index:100;}
+    .cinematic-ready{background:linear-gradient(135deg,rgba(123,0,255,0.15),rgba(230,0,160,0.1));border:1px solid rgba(230,0,160,0.35);border-radius:1.2rem;padding:16px;margin-bottom:12px;}
+    .logo-icon{width:64px;height:64px;border-radius:1.2rem;background:linear-gradient(135deg,#7b00ff,#e600a0,#00cfff);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 30px rgba(123,0,255,0.6);animation:logoPulse 2s ease-in-out infinite alternate;}
+    @keyframes logoPulse{from{box-shadow:0 0 25px rgba(123,0,255,0.5);}to{box-shadow:0 0 45px rgba(123,0,255,0.8),0 0 80px rgba(0,207,255,0.35);}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spin{animation:spin 0.8s linear infinite;}
+    .progress-bar-wrap{background:rgba(255,255,255,0.07);border-radius:999px;height:5px;overflow:hidden;margin-top:8px;}
+    .progress-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#7b00ff,#e600a0,#00cfff);transition:width 0.4s ease;}
+    /* History */
+    .history-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:1rem;padding:12px 14px;display:flex;align-items:center;gap:10px;transition:all 0.2s;}
+    .history-item:hover{border-color:rgba(123,0,255,0.4);background:rgba(123,0,255,0.08);}
+    /* Template */
+    .tpl-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:1rem;padding:12px 14px;cursor:pointer;transition:all 0.2s;text-align:left;width:100%;}
+    .tpl-btn:hover{border-color:#bf00ff;background:rgba(123,0,255,0.15);}
+    /* Tab nav */
+    .tab-nav{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px;}
+    .tab-btn{padding:8px 16px;border-radius:999px;font-size:11px;font-weight:900;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.4);white-space:nowrap;}
+    .tab-btn.active{background:linear-gradient(135deg,#7b00ff,#e600a0);color:#fff;border-color:transparent;box-shadow:0 0 16px rgba(123,0,255,0.4);}
+    /* Share toast */
+    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7b00ff,#e600a0);color:#fff;padding:12px 24px;border-radius:999px;font-size:12px;font-weight:900;z-index:9999;animation:toastIn 0.3s ease;}
+    @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  </style>
+</head>
+<body>
+<div class="aurora-bg"></div>
+<div class="particles" id="particles"></div>
+<div class="page-content max-w-xl mx-auto px-4 pb-52 pt-10" id="root"></div>
+
+<script>
+  const pc = document.getElementById('particles');
+  const colors=['#7b00ff','#e600a0','#00cfff','#00ffb3','#ffaa00'];
+  for(let i=0;i<28;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*5+2;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;filter:blur(${Math.random()*1.5}px);`;pc.appendChild(p);}
+</script>
+
+<script type="text/babel">
+  const { useState, useEffect } = React;
+
+  function getCookie(n){return document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(n+'='))?.split('=')[1]||'';}
+  function setCookie(n,v){document.cookie=n+'='+v+';max-age=315360000;path=/';}
+  let ACTIVE_KEY = getCookie('kzt_key')||localStorage.getItem('kzt_key')||'';
+
+  const VOICES=[
+    {id:'Kore',name:'ကြယ်စင်',label:'ကြယ်စင် (Female)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=KyiPyar'},
+    {id:'Aoede',name:'လမင်း',label:'လမင်း (Female)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=KhingWar'},
+    {id:'Leda',name:'သီတာ',label:'သီတာ (Female)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=NanSan'},
+    {id:'Callirrhoe',name:'ကြည်ပြာ',label:'ကြည်ပြာ (Female)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=MayThazin'},
+    {id:'Puck',name:'ကျော်ဇင်',label:'ကျော်ဇင် (Male)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=MgMg'},
+    {id:'Charon',name:'အောင်အောင်',label:'အောင်အောင် (Male)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=AungAung'},
+    {id:'Fenrir',name:'ဦးစိုး',label:'ဦးစိုး (Male)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=UThant'},
+    {id:'Orus',name:'ကိုသက်',label:'ကိုသက် (Male)',avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=HtetArkar'},
+  ];
+
+  const DEFAULT_PREFIX='Read this naturally and expressively with good emotion and flow: ';
+  const STYLE_PRESETS=[
+    {id:'story',label:'📖 ပုံပြင်',prefix:'Read this story warmly and expressively with natural pauses, like a professional storyteller: '},
+    {id:'horror',label:'👻 သရဲ',prefix:'Read this in a mysterious, suspenseful, dramatic horror narrator voice with slow pacing: '},
+    {id:'ancient',label:'🏛️ ရှေးဟောင်း',prefix:'Read this as a wise ancient historian with deep authoritative tone and gravitas: '},
+    {id:'comedy',label:'😂 ဟာသ',prefix:'Read this in a fun, lively, energetic comedic voice with enthusiasm: '},
+  ];
+
+  // Myanmar story templates
+  const TEMPLATES=[
+    {id:'t1',emoji:'👻',title:'သရဲဇာတ်လမ်း',style:'horror',text:'ညဉ့်နက်သန်းခေါင်တွင် ဟောင်းနွမ်းသောအိမ်ကြီးထဲ၌ မြင်ရမည်မဟုတ်သောအရာတစ်ခုကို တွေ့ရှိလိုက်ရသည်။ ထိုနေရာမှ ထွက်ပြေးရန် ကြိုးစားသော်လည်း တံခါးများသည် ပိတ်နေလေသည်။'},
+    {id:'t2',emoji:'💕',title:'ချစ်ခြင်းဇာတ်လမ်း',style:'story',text:'မိုးရွာချိန်တွင် ဘတ်စ်ကားမှတ်တိုင်၌ ကျွန်မတို့ ပထမဆုံးတွေ့ကြသည်။ သူ၏笑မျက်နှာကို မြင်လိုက်ရသောအခါ ရင်ထဲတွင် တစ်ခုခု ခိုင်မြဲသွားသည်ဟု ခံစားရသည်။'},
+    {id:'t3',emoji:'😂',title:'ဟာသဇာတ်လမ်း',style:'comedy',text:'ဆရာဝန်စစ်ဆေးမှုတွင် ကျွန်တော်သည် အရမ်းကြောက်တတ်သောကြောင့် မျက်လုံးမှိတ်ပြီး ထိုင်နေသည်။ ဆရာဝန်က ပါးစပ်ဖွင့်ဟုပြောသောအခါ မျက်လုံးမှိတ်ကာ ဟပ်ခနဲ ဟနေမိသည်။'},
+    {id:'t4',emoji:'🏛️',title:'သမိုင်းဇာတ်လမ်း',style:'ancient',text:'ပုဂံခေတ် ဘုရင်မင်းတရားကြီး၏ နန်းတော်တွင် စစ်ပွဲတစ်ခုအတွက် ကြီးမားသောဆုံးဖြတ်ချက်တစ်ခုကို ချမှတ်ရတော့မည်ဖြစ်သည်။'},
+    {id:'t5',emoji:'🌟',title:'အားပေးစကား',style:'story',text:'မနက်တိုင်း မျက်လုံးဖွင့်လိုက်သောအခါ ဒီနေ့ကို ကောင်းကောင်းနေနိုင်ခြင်းအတွက် ကျေးဇူးတင်ပါ။ မင်းမှာ တတ်နိုင်သည်ထက်ပိုသောအင်အားရှိသည်။'},
+    {id:'t6',emoji:'🎭',title:'ဇာတ်ကောင်နှစ်ယောက်',style:'story',text:'မိခင် — သား၊ ငါ့ကိုကြည့်ပြီး ပြောပါ၊ မင်းဘာဖြစ်နေတာလဲ။\nသား — မေမေ၊ ကျွန်တော် ကောင်းပါတယ်။ ဘာမှမဖြစ်ပါဘူး။\nမိခင် — မေမေကတော့ မယုံဘူး။'},
+  ];
+
+  const delay = ms => new Promise(r=>setTimeout(r,ms));
+  const newBlock = ()=>({id:Date.now()+Math.random(),text:'',voice:VOICES[0],styleId:null,audio:null,loading:false,previewLoading:false,status:'',progress:0});
+
+  // LocalStorage history helpers
+  const HISTORY_KEY = 'kzt_history';
+  const loadHistory = ()=>{ try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];} };
+  const saveHistory = (h)=>{ try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(0,30)));}catch{} };
+
+  function App(){
+    const [tab, setTab] = useState('studio'); // studio | history | templates
+    const [mode, setMode] = useState('solo');
+    const [blocks, setBlocks] = useState([newBlock()]);
+    const [fullAudio, setFullAudio] = useState(null);
+    const [fullLoading, setFullLoading] = useState(false);
+    const [fullStatus, setFullStatus] = useState('');
+    const [fullProgress, setFullProgress] = useState(0);
+    const [showApiModal, setShowApiModal] = useState(()=>!ACTIVE_KEY);
+    const [history, setHistory] = useState(loadHistory);
+    const [toast, setToast] = useState('');
+
+    const showToast = msg => { setToast(msg); setTimeout(()=>setToast(''),2500); };
+
+    const updateBlock = (id,patch) => setBlocks(prev=>prev.map(b=>b.id===id?{...b,...patch}:b));
+
+    const convertToWav = pcmData=>{
+      const buffer=new ArrayBuffer(44+pcmData.length*2);
+      const view=new DataView(buffer);
+      const ws=(o,s)=>{for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));};
+      ws(0,'RIFF');view.setUint32(4,32+pcmData.length*2,true);
+      ws(8,'WAVE');ws(12,'fmt ');view.setUint32(16,16,true);
+      view.setUint16(20,1,true);view.setUint16(22,1,true);
+      view.setUint32(24,24000,true);view.setUint32(28,48000,true);
+      view.setUint16(32,2,true);view.setUint16(34,16,true);
+      ws(36,'data');view.setUint32(40,pcmData.length*2,true);
+      for(let i=0;i<pcmData.length;i++)view.setInt16(44+i*2,pcmData[i],true);
+      return new Blob([buffer],{type:'audio/wav'});
+    };
+
+    const fetchTTSOnce = async(text,voiceId)=>{
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${ACTIVE_KEY}`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceId}}}}})
+      });
+      if(!res.ok)return null;
+      const data=await res.json();
+      if(data.error)return null;
+      const b64=data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      if(!b64)return null;
+      const bin=atob(b64);
+      const pcm=new Int16Array(bin.length/2);
+      for(let i=0;i<bin.length;i+=2)pcm[i/2]=(bin.charCodeAt(i+1)<<8)|bin.charCodeAt(i);
+      return pcm;
+    };
+
+    const fetchTTSWithRetry = async(text,voiceId,maxRetry=4)=>{
+      for(let attempt=1;attempt<=maxRetry;attempt++){
+        const pcm=await fetchTTSOnce(text,voiceId);
+        if(pcm)return pcm;
+        if(attempt<maxRetry)await delay(Math.pow(2,attempt)*1000);
+      }
+      return null;
+    };
+
+    const splitChunks = text=>{
+      const MAX=2000;
+      if(text.length<=MAX)return[text];
+      const chunks=[];let remaining=text.trim();
+      while(remaining.length>MAX){
+        let cut=-1;
+        for(let i=Math.min(MAX,remaining.length)-1;i>=MAX*0.3;i--){if('။၊.'.includes(remaining[i])){cut=i+1;break;}}
+        if(cut===-1){const sp=remaining.lastIndexOf(' ',MAX);cut=sp>MAX*0.3?sp+1:MAX;}
+        const chunk=remaining.slice(0,cut).trim();
+        if(chunk)chunks.push(chunk);
+        remaining=remaining.slice(cut).trim();
+      }
+      if(remaining)chunks.push(remaining);
+      return chunks.filter(c=>c.length>0);
+    };
+
+    const getPrefix = styleId=>STYLE_PRESETS.find(s=>s.id===styleId)?.prefix||DEFAULT_PREFIX;
+
+    const fetchTTSLong = async(text,voiceId,styleId,onProgress)=>{
+      const prefix=getPrefix(styleId);
+      const rawChunks=splitChunks(text);
+      const parts=[];
+      for(let i=0;i<rawChunks.length;i++){
+        if(onProgress)onProgress(i+1,rawChunks.length);
+        if(i>0)await delay(1000);
+        const pcm=await fetchTTSWithRetry(prefix+rawChunks[i],voiceId);
+        if(pcm)parts.push(pcm);
+      }
+      if(!parts.length)return null;
+      const totalLen=parts.reduce((a,c)=>a+c.length,0);
+      const merged=new Int16Array(totalLen);
+      let off=0;
+      for(const p of parts){merged.set(p,off);off+=p.length;}
+      return merged;
+    };
+
+    // Add to history
+    const addHistory = (label, url, voiceName) => {
+      const entry = { id: Date.now(), label, url, voiceName, time: new Date().toLocaleTimeString('my-MM') };
+      const updated = [entry, ...history].slice(0, 30);
+      setHistory(updated);
+      saveHistory(updated);
+    };
+
+    const handleGenerate = async(id,isPreview=false)=>{
+      if(!ACTIVE_KEY){setShowApiModal(true);return;}
+      const block=blocks.find(b=>b.id===id);
+      const voiceId=block.voice.id;
+      if(isPreview){
+        updateBlock(id,{previewLoading:true});
+        const pcm=await fetchTTSWithRetry(`မင်္ဂလာပါ။ ${block.voice.name} မှ အသံစမ်းသပ်ပေးနေခြင်းဖြစ်ပါတယ်။`,voiceId);
+        if(pcm)new Audio(URL.createObjectURL(convertToWav(pcm))).play();
+        updateBlock(id,{previewLoading:false});
+        return;
+      }
+      if(!block.text.trim())return;
+      updateBlock(id,{loading:true,audio:null,status:'စတင်နေသည်...',progress:0});
+      const pcm=await fetchTTSLong(block.text.trim(),voiceId,block.styleId,(cur,total)=>updateBlock(id,{status:total>1?`အပိုင်း ${cur}/${total} ဖတ်နေသည်...`:'ဖတ်နေသည်...',progress:Math.round((cur/total)*100)}));
+      if(pcm){
+        const url=URL.createObjectURL(convertToWav(pcm));
+        updateBlock(id,{audio:url,loading:false,status:'ပြီးပါပြီ ✓',progress:100});
+        // Save to history
+        const label = block.text.slice(0,30)+(block.text.length>30?'...':'');
+        addHistory(label, url, block.voice.name);
+      }else{
+        updateBlock(id,{loading:false,status:'မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။',progress:0});
+      }
+    };
+
+    const handleCinematic = async()=>{
+      if(!ACTIVE_KEY){setShowApiModal(true);return;}
+      const valid=blocks.filter(b=>b.text.trim());
+      if(!valid.length)return;
+      setFullLoading(true);setFullAudio(null);setFullStatus('');setFullProgress(0);
+      const silence2s=new Int16Array(24000*2).fill(0);
+      const allParts=[];
+      for(let i=0;i<valid.length;i++){
+        if(i>0){setFullStatus(`ဇာတ်ကောင် ${i+1}/${valid.length} အတွက် ပြင်ဆင်နေသည်...`);await delay(2000);}
+        setFullStatus(`ဇာတ်ကောင် ${i+1}/${valid.length} ဖတ်နေသည်...`);
+        setFullProgress(Math.round((i/valid.length)*100));
+        const pcm=await fetchTTSLong(valid[i].text.trim(),valid[i].voice.id,valid[i].styleId,(cur,total)=>setFullStatus(`ဇာတ်ကောင် ${i+1}/${valid.length} — အပိုင်း ${cur}/${total}`));
+        if(pcm){allParts.push(pcm);if(i<valid.length-1)allParts.push(silence2s);}
+      }
+      if(allParts.length){
+        const total=allParts.reduce((a,c)=>a+c.length,0);
+        const full=new Int16Array(total);let off=0;
+        for(const c of allParts){full.set(c,off);off+=c.length;}
+        const url=URL.createObjectURL(convertToWav(full));
+        setFullAudio(url);setFullStatus('ပြီးပါပြီ ✓');setFullProgress(100);
+        addHistory('Cinematic Story', url, 'Mixed');
+      }else{
+        setFullStatus('မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။');
+      }
+      setFullLoading(false);
+    };
+
+    const download=(url,name)=>{const a=document.createElement('a');a.href=url;a.download=name;a.click();};
+
+    // Share — copy blob URL or show share sheet
+    const shareAudio = async(url, label) => {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const file = new File([blob], `${label}.wav`, {type:'audio/wav'});
+        if(navigator.share && navigator.canShare({files:[file]})){
+          await navigator.share({title:'KZT Studio Audio', files:[file]});
+        } else {
+          await navigator.clipboard.writeText(window.location.href);
+          showToast('Link ကို Copy လုပ်ပြီးပါပြီ ✓');
+        }
+      } catch {
+        showToast('Share မရပါ။ Download ကြိုးစားပါ။');
+      }
+    };
+
+    const applyTemplate = tpl => {
+      setBlocks([{...newBlock(), text: tpl.text, styleId: tpl.style, voice: VOICES[0]}]);
+      setTab('studio');
+    };
+
+    const clearHistory = () => { setHistory([]); saveHistory([]); };
+
+    return (
+      <div>
+        {toast && <div className="toast">✓ {toast}</div>}
+
+        {/* API Key Modal */}
+        {showApiModal&&(
+          <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+            <div style={{background:'linear-gradient(135deg,#0a001e,#120030)',border:'1px solid rgba(123,0,255,0.5)',borderRadius:'1.5rem',padding:'32px 28px',width:'100%',maxWidth:'420px',boxShadow:'0 0 60px rgba(123,0,255,0.4)'}}>
+              <div style={{textAlign:'center',marginBottom:'24px'}}>
+                <div style={{width:'52px',height:'52px',borderRadius:'1rem',background:'linear-gradient(135deg,#7b00ff,#e600a0)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+                  <i className="fa-solid fa-key" style={{fontSize:'22px',color:'#fff'}}></i>
+                </div>
+                <h2 style={{margin:0,fontFamily:'Orbitron,sans-serif',fontSize:'1.2rem',fontWeight:900,color:'#fff'}}>API Key လိုအပ်သည်</h2>
+                <p style={{margin:'8px 0 0',fontSize:'12px',color:'rgba(255,255,255,0.5)'}}>Gemini API key ထည့်သွင်းပါ</p>
+              </div>
+              <input id="mkI" type="password" defaultValue={ACTIVE_KEY} placeholder="AIzaSy..."
+                style={{width:'100%',background:'rgba(0,0,0,0.5)',border:'1.5px solid rgba(123,0,255,0.5)',borderRadius:'0.75rem',padding:'13px 16px',fontSize:'13px',color:'#fff',outline:'none',fontFamily:'monospace',boxSizing:'border-box',marginBottom:'16px'}}
+                onKeyDown={e=>{if(e.key==='Enter'){const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;setCookie('kzt_key',v);localStorage.setItem('kzt_key',v);setShowApiModal(false);}}}
+              />
+              <button onClick={()=>{const v=document.getElementById('mkI').value.trim();if(!v)return;ACTIVE_KEY=v;setCookie('kzt_key',v);localStorage.setItem('kzt_key',v);setShowApiModal(false);}}
+                style={{width:'100%',padding:'14px',background:'linear-gradient(135deg,#7b00ff,#e600a0)',border:'none',borderRadius:'0.75rem',color:'#fff',fontWeight:900,fontSize:'13px',cursor:'pointer'}}>
+                <i className="fa-solid fa-floppy-disk" style={{marginRight:'8px'}}></i>Save &amp; Continue
+              </button>
+              {ACTIVE_KEY&&<button onClick={()=>setShowApiModal(false)} style={{width:'100%',marginTop:'10px',padding:'10px',background:'transparent',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'0.75rem',color:'rgba(255,255,255,0.4)',fontSize:'12px',cursor:'pointer'}}>Cancel</button>}
+            </div>
+          </div>
+        )}
+
+        {/* Header */}
+        <header style={{textAlign:'center',marginBottom:'24px',position:'relative'}}>
+          <button onClick={()=>{const v=prompt('Gemini API Key:',ACTIVE_KEY);if(!v)return;const t=v.trim();if(!t)return;ACTIVE_KEY=t;setCookie('kzt_key',t);localStorage.setItem('kzt_key',t);}}
+            title="API Key" style={{position:'absolute',top:0,right:0,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.5)',width:'38px',height:'38px',borderRadius:'0.75rem',cursor:'pointer',fontSize:'16px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            ⚙️
+          </button>
+          <div className="logo-icon"><i className="fa-solid fa-microphone-lines" style={{fontSize:'26px',color:'#fff'}}></i></div>
+          <h1 style={{fontSize:'2rem',fontWeight:900,margin:0,letterSpacing:'0.08em'}} className="rainbow-text">KZT STUDIO</h1>
+          <p style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.3em',marginTop:'6px'}}>Professional Voice Studio v2</p>
+        </header>
+
+        {/* Tab Navigation */}
+        <div className="tab-nav">
+          <button className={`tab-btn ${tab==='studio'?'active':''}`} onClick={()=>setTab('studio')}>🎙️ Studio</button>
+          <button className={`tab-btn ${tab==='templates'?'active':''}`} onClick={()=>setTab('templates')}>📝 Templates</button>
+          <button className={`tab-btn ${tab==='history'?'active':''}`} onClick={()=>setTab('history')}>
+            🕐 History {history.length>0&&<span style={{background:'#e600a0',borderRadius:'999px',padding:'1px 6px',fontSize:'9px',marginLeft:'4px'}}>{history.length}</span>}
+          </button>
+        </div>
+
+        {/* ── STUDIO TAB ── */}
+        {tab==='studio'&&(
+          <div>
+            <div className="mode-bar" style={{marginBottom:'24px'}}>
+              <button className={`mode-btn ${mode==='solo'?'active':''}`} onClick={()=>setMode('solo')}>◆ Solo Mode</button>
+              <button className={`mode-btn ${mode==='drama'?'active':''}`} onClick={()=>setMode('drama')}>◆ Cinematic Mode</button>
+            </div>
+
+            <div style={{display:'flex',flexDirection:'column',gap:'20px'}}>
+              {blocks.map(b=>(
+                <div key={b.id} className="cyber-card" style={{position:'relative'}}>
+                  <div className="cyber-card-inner">
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+                        <img src={b.voice.avatar} className="avatar-img" alt={b.voice.name}/>
+                        <div>
+                          <div style={{fontWeight:900,fontSize:'14px'}}>{b.voice.name}</div>
+                          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.45)',fontWeight:700,textTransform:'uppercase'}}>{b.voice.label}</div>
+                        </div>
+                      </div>
+                      <button className="test-btn" onClick={()=>handleGenerate(b.id,true)} disabled={b.previewLoading||b.loading}>
+                        {b.previewLoading?<i className="fa-solid fa-spinner spin"></i>:<i className="fa-solid fa-ear-listen"></i>}Test
+                      </button>
+                    </div>
+
+                    <select className="cyber-select" value={b.voice.id}
+                      onChange={e=>updateBlock(b.id,{voice:VOICES.find(v=>v.id===e.target.value)})}
+                      style={{marginBottom:'12px'}}>
+                      {VOICES.map(v=><option key={v.id} value={v.id}>{v.label}</option>)}
+                    </select>
+
+                    <div style={{display:'flex',flexWrap:'wrap',gap:'7px',marginBottom:'12px'}}>
+                      {STYLE_PRESETS.map(s=>(
+                        <button key={s.id} className={`style-btn ${b.styleId===s.id?'active':''}`}
+                          onClick={()=>updateBlock(b.id,{styleId:b.styleId===s.id?null:s.id})}>{s.label}</button>
+                      ))}
+                    </div>
+
+                    <textarea className="cyber-textarea"
+                      placeholder="ဒီနေရာမှာ စာသားရိုက်ထည့်ပါ..."
+                      value={b.text} onChange={e=>updateBlock(b.id,{text:e.target.value})}/>
+
+                    {mode==='solo'&&(
+                      <div style={{marginTop:'14px'}}>
+                        {b.audio&&(
+                          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
+                            <audio src={b.audio} controls style={{flex:1}}/>
+                            <button className="dl-btn" onClick={()=>download(b.audio,`KZT_${b.voice.name}_${Date.now()}.wav`)} title="Download">
+                              <i className="fa-solid fa-download" style={{fontSize:'13px'}}></i>
+                            </button>
+                            <button className="dl-btn" onClick={()=>shareAudio(b.audio,`KZT_${b.voice.name}`)} title="Share"
+                              style={{background:'rgba(230,0,160,0.1)',borderColor:'rgba(230,0,160,0.3)',color:'#e600a0'}}>
+                              <i className="fa-solid fa-share-nodes" style={{fontSize:'13px'}}></i>
+                            </button>
+                          </div>
+                        )}
+                        <button className="grad-btn"
+                          style={{width:'100%',padding:'16px',fontSize:'12px',textTransform:'uppercase',letterSpacing:'0.08em'}}
+                          onClick={()=>handleGenerate(b.id)} disabled={b.loading||!b.text.trim()}>
+                          {b.loading?<><i className="fa-solid fa-circle-notch spin" style={{marginRight:'8px'}}></i>{b.status||'Generating...'}</>
+                          :<><i className="fa-solid fa-play" style={{marginRight:'8px'}}></i>Generate Audio</>}
+                        </button>
+                        {b.loading&&b.progress>0&&<div className="progress-bar-wrap"><div className="progress-bar-fill" style={{width:`${b.progress}%`}}></div></div>}
+                        {b.status&&!b.loading&&(
+                          <p style={{margin:'8px 0 0',fontSize:'11px',textAlign:'center',color:b.status.includes('✓')?'#00ffb3':b.status.includes('မအောင်')?'#ff4466':'rgba(255,255,255,0.5)'}}>{b.status}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {mode==='drama'&&blocks.length>1&&(
+                    <button className="remove-btn" onClick={()=>setBlocks(prev=>prev.filter(x=>x.id!==b.id))}>
+                      <i className="fa-solid fa-times"></i>
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button className="add-btn" onClick={()=>setBlocks(prev=>[...prev,newBlock()])}>+ Add New Dialogue</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── TEMPLATES TAB ── */}
+        {tab==='templates'&&(
+          <div>
+            <p style={{fontSize:'12px',color:'rgba(255,255,255,0.4)',marginBottom:'16px',textAlign:'center'}}>Template ရွေးလိုက်ရင် Studio မှာ အလိုအလျောက် ဖြည့်ပေးမယ်</p>
+            <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+              {TEMPLATES.map(tpl=>(
+                <button key={tpl.id} className="tpl-btn" onClick={()=>applyTemplate(tpl)}>
+                  <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <span style={{fontSize:'28px'}}>{tpl.emoji}</span>
+                    <div style={{textAlign:'left'}}>
+                      <div style={{fontWeight:900,fontSize:'14px',marginBottom:'4px'}}>{tpl.title}</div>
+                      <div style={{fontSize:'11px',color:'rgba(255,255,255,0.4)',lineHeight:1.4}}>{tpl.text.slice(0,60)}...</div>
+                    </div>
+                    <i className="fa-solid fa-chevron-right" style={{marginLeft:'auto',color:'rgba(255,255,255,0.3)',fontSize:'12px'}}></i>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── HISTORY TAB ── */}
+        {tab==='history'&&(
+          <div>
+            {history.length===0?(
+              <div style={{textAlign:'center',padding:'60px 20px',color:'rgba(255,255,255,0.3)'}}>
+                <i className="fa-solid fa-clock-rotate-left" style={{fontSize:'40px',marginBottom:'16px',display:'block'}}></i>
+                <p style={{fontSize:'13px'}}>Audio History မရှိသေးပါ</p>
+              </div>
+            ):(
+              <div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}>
+                  <span style={{fontSize:'12px',color:'rgba(255,255,255,0.4)'}}>{history.length} ခု သိမ်းထားသည်</span>
+                  <button onClick={clearHistory} style={{background:'rgba(255,0,60,0.1)',border:'1px solid rgba(255,0,60,0.3)',color:'#ff4466',padding:'6px 14px',borderRadius:'0.75rem',fontSize:'11px',fontWeight:900,cursor:'pointer'}}>
+                    အားလုံးဖျက်
+                  </button>
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {history.map(h=>(
+                    <div key={h.id} className="history-item">
+                      <div style={{width:'36px',height:'36px',borderRadius:'0.75rem',background:'linear-gradient(135deg,#7b00ff,#e600a0)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        <i className="fa-solid fa-waveform-lines" style={{fontSize:'14px'}}></i>
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:'13px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h.label}</div>
+                        <div style={{fontSize:'10px',color:'rgba(255,255,255,0.4)'}}>{h.voiceName} · {h.time}</div>
+                      </div>
+                      <div style={{display:'flex',gap:'6px'}}>
+                        <button className="dl-btn" onClick={()=>new Audio(h.url).play()} title="Play"
+                          style={{background:'rgba(0,207,255,0.1)',borderColor:'rgba(0,207,255,0.3)',color:'#00cfff'}}>
+                          <i className="fa-solid fa-play" style={{fontSize:'12px'}}></i>
+                        </button>
+                        <button className="dl-btn" onClick={()=>download(h.url,`KZT_${h.time}.wav`)} title="Download">
+                          <i className="fa-solid fa-download" style={{fontSize:'12px'}}></i>
+                        </button>
+                        <button className="dl-btn" onClick={()=>shareAudio(h.url,h.label)} title="Share"
+                          style={{background:'rgba(230,0,160,0.1)',borderColor:'rgba(230,0,160,0.3)',color:'#e600a0'}}>
+                          <i className="fa-solid fa-share-nodes" style={{fontSize:'12px'}}></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Cinematic footer */}
+        {tab==='studio'&&mode==='drama'&&(
+          <div className="sticky-footer">
+            <div style={{maxWidth:'576px',margin:'0 auto'}}>
+              {fullAudio&&(
+                <div className="cinematic-ready" style={{marginBottom:'12px'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}>
+                    <span style={{fontSize:'10px',fontWeight:900,color:'#e600a0',textTransform:'uppercase',letterSpacing:'0.2em'}}>✦ Full Narrative Ready</span>
+                    <div style={{display:'flex',gap:'6px'}}>
+                      <button className="dl-btn" onClick={()=>download(fullAudio,`KZT_Story_${Date.now()}.wav`)}>
+                        <i className="fa-solid fa-download" style={{fontSize:'13px'}}></i>
+                      </button>
+                      <button className="dl-btn" onClick={()=>shareAudio(fullAudio,'KZT_Story')}
+                        style={{background:'rgba(230,0,160,0.1)',borderColor:'rgba(230,0,160,0.3)',color:'#e600a0'}}>
+                        <i className="fa-solid fa-share-nodes" style={{fontSize:'13px'}}></i>
+                      </button>
+                    </div>
+                  </div>
+                  <audio src={fullAudio} controls/>
+                </div>
+              )}
+              <button className="grad-btn"
+                style={{width:'100%',padding:'20px',fontSize:'12px',textTransform:'uppercase',letterSpacing:'0.08em',borderRadius:'1.5rem'}}
+                onClick={handleCinematic} disabled={fullLoading}>
+                {fullLoading?<><i className="fa-solid fa-circle-notch spin" style={{marginRight:'10px'}}></i>{fullStatus||'Synthesizing...'}</>
+                :<><i className="fa-solid fa-clapperboard" style={{marginRight:'10px'}}></i>Generate Full Cinematic Audio</>}
+              </button>
+              {fullLoading&&fullProgress>0&&<div className="progress-bar-wrap" style={{marginTop:'10px'}}><div className="progress-bar-fill" style={{width:`${fullProgress}%`}}></div></div>}
+              {fullStatus&&!fullLoading&&(
+                <p style={{margin:'8px 0 0',fontSize:'11px',textAlign:'center',color:fullStatus.includes('✓')?'#00ffb3':fullStatus.includes('မအောင်')?'#ff4466':'rgba(255,255,255,0.5)'}}>{fullStatus}</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
